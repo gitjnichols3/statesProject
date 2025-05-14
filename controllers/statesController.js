@@ -22,7 +22,7 @@ const getRandomFunfact = async (req, res) => {
 
       if (!foundState.funfacts || foundState.funfacts.length === 0) {
           const stateName = stateFromJson ? stateFromJson.state : stateCode;
-          return res.status(404).json({ 'message': `No Fun Facts found for '${stateName}'.` });
+          return res.status(404).json({ 'message': `No Fun Facts found for ${stateName}` });
       }
 
       // Pick a random funfact from the funfacts array
