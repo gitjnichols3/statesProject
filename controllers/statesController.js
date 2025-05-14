@@ -23,7 +23,7 @@ const getRandomFunfact = async (req, res) => {
 
     if (!foundState || !foundState.funfacts || foundState.funfacts.length === 0) {
       return res.status(404).json({
-        message: `No Fun Facts found for ${stateFromJson.state}.`
+        message: `No Fun Facts found for ${stateFromJson.state}`
       });
     }
 
