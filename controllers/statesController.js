@@ -134,53 +134,7 @@ const postStateFunfact = async (req, res) => {
   }
 };
 
-const addFunfactsToState = async (req, res) => {
-  const stateCode = req.params.state.toUpperCase();
-  const { funfacts } = req.body;
-
-  // Check if funfacts is provided
-  if (!funfacts) {
-      return res.status(400).json({ message: 'State fun facts value required' });
-  }
-
-  // Check if it's an array
-  if (!Array.isArray(funfacts)) {
-      return res.status(400).json({ message: 'State fun facts value must be an array' });
-  }
-
-  try {
-      const foundState = await Statesdb.findOne({ stateCode });
-
-      // If no document in MongoDB, create one
-      if (!foundState) {
-          const newState = await Statesdb.create({
-              stateCode,
-              funfacts: funfacts
-          });
-          return res.status(201).json({
-              ...getBaseStateData(stateCode),
-              funfacts: newState.funfacts
-          });
-      }
-
-      // Append new funfacts to existing ones
-      foundState.funfacts.push(...funfacts);
-      const updatedState = await foundState.save();
-
-      res.status(200).json({
-          ...getBaseStateData(stateCode),
-          funfacts: updatedState.funfacts
-      });
-
-  } catch (err) {
-      res.status(500).json({ message: 'Error adding fun facts', error: err });
-  }
-};
-
-
-
-
-/* const addFunfactToState = async (req, res) => {
+const addFunfactToState = async (req, res) => {
   const stateCode = req.params.state.toUpperCase(); // Get stateCode from URL params
   const { funfact } = req.body; // Get funfact from the request body
 
@@ -214,7 +168,7 @@ const addFunfactsToState = async (req, res) => {
       console.error("Error adding funfact to state:", err);  // Log the error for debugging
       res.status(500).json({ message: "Error adding funfact to state", error: err });
   }
-}; */
+};
 
 const getAllStates = async (req, res) => {
   const { contig } = req.query;
