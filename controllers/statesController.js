@@ -39,7 +39,6 @@ const getRandomFunfact = async (req, res) => {
 
 
 
-
 const deleteFunfactFromState = async (req, res) => {
   const stateCode = req.params.state.toUpperCase();
   const { index } = req.body;
@@ -50,16 +49,15 @@ const deleteFunfactFromState = async (req, res) => {
 
   const adjustedIndex = parseInt(index, 10) - 1;
 
+  // Always get the state name from JSON first (for error messages)
+  const stateData = data.states.find(state => state.code === stateCode);
+  const stateName = stateData?.state || stateCode;
+
   try {
     const foundState = await Statesdb.findOne({ stateCode });
 
-    if (!foundState) {
-      return res.status(404).json({ message: `State with code '${stateCode}' not found` });
-    }
-
-    const stateName = data.states.find(state => state.code === stateCode)?.state || stateCode;
-
-    if (!Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
+    // State exists in JSON but not in MongoDB
+    if (!foundState || !Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
       return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
     }
 
