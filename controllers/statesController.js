@@ -6,36 +6,38 @@ const data = {
 }
 //test
 const getRandomFunfact = async (req, res) => {
-  const stateCode = req.params.state.toUpperCase(); // Get stateCode from URL params
+  const stateCode = req.params.state.toUpperCase();
 
-  // Get the state name from your static JSON
+  // Check if it's a valid state code using your JSON
   const stateFromJson = data.states.find(
     state => state.code === stateCode
   );
 
+  if (!stateFromJson) {
+    return res.status(400).json({ message: 'Invalid state abbreviation parameter' });
+  }
+
   try {
-      // Find the state by its stateCode in MongoDB
-      const foundState = await Statesdb.findOne({ stateCode: stateCode });
+    // Now check if funfacts exist in MongoDB
+    const foundState = await Statesdb.findOne({ stateCode });
 
-      if (!foundState) {
-        return res.status(404).json({ 'message': `Invalid state abbreviation parameter` });
-      }
+    if (!foundState || !foundState.funfacts || foundState.funfacts.length === 0) {
+      return res.status(404).json({
+        message: `No Fun Facts found for ${stateFromJson.state}.`
+      });
+    }
 
-      if (!foundState.funfacts || foundState.funfacts.length === 0) {
-          const stateName = stateFromJson ? stateFromJson.state : stateCode;
-          return res.status(404).json({ 'message': `No Fun Facts found for ${stateName}.` });
-      }
+    // Randomly select a funfact
+    const randomIndex = Math.floor(Math.random() * foundState.funfacts.length);
+    const randomFunfact = foundState.funfacts[randomIndex];
 
-      // Pick a random funfact from the funfacts array
-      const randomIndex = Math.floor(Math.random() * foundState.funfacts.length);
-      const randomFunfact = foundState.funfacts[randomIndex];
-
-      res.status(200).json({ funfact: randomFunfact });
+    res.status(200).json({ funfact: randomFunfact });
 
   } catch (err) {
-      res.status(500).json({ message: "Error fetching random funfact", error: err });
+    res.status(500).json({ message: "Error fetching random funfact", error: err });
   }
 };
+
 
 
 const deleteFunfactFromState = async (req, res) => {
