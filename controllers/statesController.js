@@ -4,7 +4,7 @@ const data = {
     states: require('../model/statesData.json'),
     setStates: function (data) { this.states = data }
 }
-
+//test
 const getRandomFunfact = async (req, res) => {
   const stateCode = req.params.state.toUpperCase(); // Get stateCode from URL params
 
@@ -12,8 +12,12 @@ const getRandomFunfact = async (req, res) => {
       // Find the state by its stateCode in MongoDB
       const foundState = await Statesdb.findOne({ stateCode: stateCode });
 
-      if (!foundState || !foundState.funfacts || foundState.funfacts.length === 0) {
-          return res.status(404).json({ 'message': `No fun facts found for state with code '${stateCode}'.` });
+      if (!foundState){
+        return res.status(404).json({ 'message': `Invalid state abbreviation parameter`});
+      }
+
+      if (!foundState.funfacts || foundState.funfacts.length === 0) {
+          return res.status(404).json({ 'message': `No Fun Facts found for '${stateCode}'.` });
       }
 
       // Pick a random funfact from the funfacts array
