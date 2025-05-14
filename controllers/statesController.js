@@ -228,7 +228,7 @@ const getStateByParam = async (req, res) => {
   // 1. Find JSON record
   const jsonState = data.states.find(state => state.code === stateParam);
   if (!jsonState) {
-      return res.status(404).json({ message: `State '${req.params.state}' not found. Use state code - 2 letter abbreviation` });
+      return res.status(404).json({ message: `Invalid state abbreviation parameter` });
   }
 
   try {
