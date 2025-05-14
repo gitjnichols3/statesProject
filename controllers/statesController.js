@@ -281,7 +281,7 @@ const getStateCapitalByParam = (req, res) => {
     );
   
     if (!foundState) {
-      return res.status(404).json({ message: `State '${req.params.state}' not found. Use state code - 2 letter abbreviation` });
+      return res.status(404).json({ message: `Invalid state abbreviation parameter` });
     }
   
     res.json({ state: foundState.state, capital: foundState.capital_city });
@@ -297,7 +297,7 @@ const getStateCapitalByParam = (req, res) => {
     );
   
     if (!foundState) {
-      return res.status(404).json({ message: `State '${req.params.state}' not found. Use state code - 2 letter abbreviation` });
+      return res.status(404).json({ message: `Invalid state abbreviation parameter` });
     }
   
     res.json({ state: foundState.state, nickname: foundState.nickname });
@@ -314,7 +314,7 @@ const getStatePopulationByParam = (req, res) => {
     );
   
     if (!foundState) {
-      return res.status(404).json({ message: `State '${req.params.state}' not found. Use state code - 2 letter abbreviation` });
+      return res.status(404).json({ message: `Invalid state abbreviation parameter` });
     }
   
     res.json({ state: foundState.state, population: foundState.population });
@@ -350,7 +350,7 @@ const createNewState = (req, res) => {
     }
 
     if (!newState.state || !newState.nickname) {
-        return res.status(400).json({ 'message': 'State name and nickname are required.' });
+        return res.status(400).json({ 'message': 'Invalid state abbreviation parameter' });
     }
 
     data.setStates([...data.states, newState]);
