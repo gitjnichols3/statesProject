@@ -28,6 +28,9 @@ router.route('/:state/nickname')
 router.route('/:state/population')
     .get(statesController.getStatePopulationByParam);
 
+router.route('/:state/capital')
+    .get(statesController.getStateCapitalByParam);
+
 router.route('/:state/admission')
     .get(statesController.getStateAdmissionByParam);
 
