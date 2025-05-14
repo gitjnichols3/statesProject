@@ -187,11 +187,11 @@ const getAllStates = async (req, res) => {
 
       // Filter based on config query param
       let filteredStates = data.states;
-      if (config === 'true') {
+      if (contig === 'true') {
           filteredStates = filteredStates.filter(
               state => state.state !== 'Alaska' && state.state !== 'Hawaii'
           );
-      } else if (config === 'false') {
+      } else if (contig === 'false') {
           filteredStates = filteredStates.filter(
               state => state.state === 'Alaska' || state.state === 'Hawaii'
           );
