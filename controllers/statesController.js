@@ -40,7 +40,47 @@ const getRandomFunfact = async (req, res) => {
 
 
 
+const deleteFunfactFromState = async (req, res) => {
+  const stateCode = req.params.state.toUpperCase();
+  const { index } = req.body;
 
+  if (!index) {
+    return res.status(400).json({ message: 'State fun fact index value required' });
+  }
+
+  const adjustedIndex = parseInt(index, 10) - 1;
+
+  try {
+    const foundState = await Statesdb.findOne({ stateCode });
+
+    if (!foundState) {
+      return res.status(404).json({ message: `State with code '${stateCode}' not found` });
+    }
+
+    const stateName = data.states.find(state => state.code === stateCode)?.state || stateCode;
+
+    if (!Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
+      return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
+    }
+
+    if (adjustedIndex < 0 || adjustedIndex >= foundState.funfacts.length) {
+      return res.status(400).json({ message: `No Fun Fact found at that index for ${stateName}` });
+    }
+
+    foundState.funfacts.splice(adjustedIndex, 1);
+
+    const updatedState = await foundState.save();
+    res.status(200).json(updatedState);
+
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting funfact', error: err.message });
+  }
+};
+
+
+
+
+/* 
 const deleteFunfactFromState = async (req, res) => {
   const stateCode = req.params.state.toUpperCase();
   const { index } = req.body;
@@ -73,7 +113,7 @@ const deleteFunfactFromState = async (req, res) => {
   } catch (err) {
       res.status(500).json({ message: "Error deleting funfact", error: err.message });
   }
-};
+}; */
 
 
 
