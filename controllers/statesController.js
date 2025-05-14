@@ -330,7 +330,7 @@ const getStatePopulationByParam = (req, res) => {
     );
   
     if (!foundState) {
-      return res.status(404).json({ message: `State '${req.params.state}' not found. Use state code - 2 letter abbreviation` });
+      return res.status(404).json({ message: `Invalid state abbreviation parameter` });
     }
   
     res.json({ state: foundState.state, admitted: foundState.admission_date });
