@@ -96,9 +96,17 @@ const patchFunfact = async (req, res) => {
   try {
     const foundState = await Statesdb.findOne({ stateCode });
 
-    if (!foundState) {
-      return res.status(404).json({ message: `State with code '${stateCode}' not found` });
+    // Look up the full state name from the JSON data
+    const jsonState = data.states.find(st => st.code === stateCode);
+    if (!jsonState) {
+      return res.status(404).json({ message: 'Invalid state abbreviation parameter' });
     }
+    
+    // If state not found in MongoDB or has no funfacts, send the required message
+    if (!foundState || !Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
+      return res.status(404).json({ message: `No Fun Facts found for ${jsonState.state}` });
+    }
+    
 
     if (!foundState.funfacts || foundState.funfacts.length === 0) {
       // Pull name from your JSON source since MongoDB may not store it
