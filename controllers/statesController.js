@@ -75,14 +75,13 @@ const deleteFunfactFromState = async (req, res) => {
   }
 };
 
+
+
+
+
 const patchFunfact = async (req, res) => {
   const stateCode = req.params.state.toUpperCase();
   const { index, funfact } = req.body;
-
-  const stateData = data.states.find(state => state.code === stateCode);
-  if (!stateData) {
-    return res.status(400).json({ message: 'Invalid state abbreviation parameter' });
-  }
 
   if (index === undefined) {
     return res.status(400).json({ message: 'State fun fact index value required' });
@@ -98,15 +97,20 @@ const patchFunfact = async (req, res) => {
     const foundState = await Statesdb.findOne({ stateCode });
 
     if (!foundState) {
-      return res.status(404).json({ message: `No state found with code ${stateCode}` });
+      return res.status(404).json({ message: `State with code '${stateCode}' not found` });
     }
 
-    if (!Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
-      return res.status(404).json({ message: `No Fun Facts found for ${stateData.state}` });
+    if (!foundState.funfacts || foundState.funfacts.length === 0) {
+      // Pull name from your JSON source since MongoDB may not store it
+      const fullState = data.states.find(st => st.code === stateCode);
+      const stateName = fullState?.state || stateCode;
+      return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
     }
 
     if (adjustedIndex < 0 || adjustedIndex >= foundState.funfacts.length) {
-      return res.status(400).json({ message: `No Fun Fact found at that index for ${stateData.state}` });
+      const fullState = data.states.find(st => st.code === stateCode);
+      const stateName = fullState?.state || stateCode;
+      return res.status(400).json({ message: `No Fun Fact found at that index for ${stateName}` });
     }
 
     foundState.funfacts[adjustedIndex] = funfact;
@@ -117,6 +121,10 @@ const patchFunfact = async (req, res) => {
     res.status(500).json({ message: 'Error updating fun fact', error: err.message });
   }
 };
+
+
+
+
 
 
 
