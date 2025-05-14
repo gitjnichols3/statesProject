@@ -8,6 +8,10 @@ const data = {
 const getRandomFunfact = async (req, res) => {
   const stateCode = req.params.state.toUpperCase(); // Get stateCode from URL params
 
+  const stateFromJson = data.states.find(
+    state => state.code === stateCode
+  );
+
   try {
       // Find the state by its stateCode in MongoDB
       const foundState = await Statesdb.findOne({ stateCode: stateCode });
@@ -17,7 +21,8 @@ const getRandomFunfact = async (req, res) => {
       }
 
       if (!foundState.funfacts || foundState.funfacts.length === 0) {
-          return res.status(404).json({ 'message': `No Fun Facts found for '${stateCode}'.` });
+          const stateName = stateFromJson ? stateFromJson.state : stateCode;
+          return res.status(404).json({ 'message': `No Fun Facts found for '${stateName}'.` });
       }
 
       // Pick a random funfact from the funfacts array
