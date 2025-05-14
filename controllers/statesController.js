@@ -171,7 +171,7 @@ const addFunfactToState = async (req, res) => {
 };
 
 const getAllStates = async (req, res) => {
-  const { config } = req.query;
+  const { contig } = req.query;
 
   try {
       // Get all funfacts from MongoDB once (more efficient)
