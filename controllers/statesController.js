@@ -5,7 +5,7 @@ const data = {
     setStates: function (data) { this.states = data }
 }
 
-
+//get a random funfact
 
 const getRandomFunfact = async (req, res) => {
   const stateCode = req.params.state.toUpperCase();
@@ -38,6 +38,8 @@ const getRandomFunfact = async (req, res) => {
 };
 
 
+//delete funfact by state by array index
+
 
 const deleteFunfactFromState = async (req, res) => {
   const stateCode = req.params.state.toUpperCase();
@@ -49,14 +51,12 @@ const deleteFunfactFromState = async (req, res) => {
 
   const adjustedIndex = parseInt(index, 10) - 1;
 
-  // Always get the state name from JSON first (for error messages)
   const stateData = data.states.find(state => state.code === stateCode);
   const stateName = stateData?.state || stateCode;
 
   try {
     const foundState = await Statesdb.findOne({ stateCode });
 
-    // State exists in JSON but not in MongoDB
     if (!foundState || !Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
       return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
     }
@@ -76,46 +76,7 @@ const deleteFunfactFromState = async (req, res) => {
 };
 
 
-
-
-/* 
-const deleteFunfactFromState = async (req, res) => {
-  const stateCode = req.params.state.toUpperCase();
-  const { index } = req.body;
-
-  if (!index) {
-      return res.status(400).json({ message: 'Index is required.' });
-  }
-
-  const adjustedIndex = parseInt(index, 10) - 1; 
-
-  try {
-      const foundState = await Statesdb.findOne({ stateCode });
-
-      if (!foundState) {
-          return res.status(404).json({ message: `State with code '${stateCode}' not found.` });
-      }
-
-      if (!foundState.funfacts || foundState.funfacts.length === 0) {
-          return res.status(404).json({ message: `No Fun Facts found for ${stateCode}` });
-      }
-
-      if (adjustedIndex < 0 || adjustedIndex >= foundState.funfacts.length) {
-          return res.status(400).json({ message: `Fun Fact index ${index} out of range.` });
-      }
-
-      foundState.funfacts.splice(adjustedIndex, 1);
-
-      const updatedState = await foundState.save();
-      res.status(200).json(updatedState);
-  } catch (err) {
-      res.status(500).json({ message: "Error deleting funfact", error: err.message });
-  }
-}; */
-
-
-
-
+//uses patch to replace one funfact with another based on array index value
 
 const patchFunfact = async (req, res) => {
   const stateCode = req.params.state.toUpperCase();
@@ -134,20 +95,17 @@ const patchFunfact = async (req, res) => {
   try {
     const foundState = await Statesdb.findOne({ stateCode });
 
-    // Look up the full state name from the JSON data
     const jsonState = data.states.find(st => st.code === stateCode);
     if (!jsonState) {
       return res.status(404).json({ message: 'Invalid state abbreviation parameter' });
     }
     
-    // If state not found in MongoDB or has no funfacts, send the required message
     if (!foundState || !Array.isArray(foundState.funfacts) || foundState.funfacts.length === 0) {
       return res.status(404).json({ message: `No Fun Facts found for ${jsonState.state}` });
     }
     
 
     if (!foundState.funfacts || foundState.funfacts.length === 0) {
-      // Pull name from your JSON source since MongoDB may not store it
       const fullState = data.states.find(st => st.code === stateCode);
       const stateName = fullState?.state || stateCode;
       return res.status(404).json({ message: `No Fun Facts found for ${stateName}` });
@@ -170,47 +128,7 @@ const patchFunfact = async (req, res) => {
 
 
 
-
-
-
-
-/* const patchFunfact = async (req, res) => {
-  const stateCode = req.params.state.toUpperCase();
-  const { index, funfact } = req.body;
-
-
-  if (!index || !funfact) {
-    return res.status(400).json({ message: 'Both index and funfact are required.' });
-  }
-
-  
-  const adjustedIndex = parseInt(index, 10) - 1;
-
-  try {
-    const foundState = await Statesdb.findOne({ stateCode });
-
-    if (!foundState) {
-      return res.status(404).json({ message: `State with code '${stateCode}' not found.` });
-    }
-
-    if (!Array.isArray(foundState.funfacts) || adjustedIndex < 0 || adjustedIndex >= foundState.funfacts.length) {
-      return res.status(400).json({ message: `No fun fact found at index ${index}.` });
-    }
-
-    foundState.funfacts[adjustedIndex] = funfact;
-
-    const updatedState = await foundState.save();
-    res.json(updatedState);
-
-  } catch (err) {
-    res.status(500).json({ message: 'Error updating fun fact.', error: err.message });
-  }
-}; */
-
-
-
-
-
+//Posts a funfact to a new stateCode in MongoDB. Used to set up initial data using ThunderClient.
 
 const postStateFunfact = async (req, res) => {
   const { stateCode, funfact } = req.body;
@@ -234,7 +152,7 @@ const postStateFunfact = async (req, res) => {
 
 
 
-
+//Add funfact to a specific state by stateCode.
 
 const addFunfactToState = async (req, res) => {
   const stateCode = req.params.state.toUpperCase(); 
@@ -266,6 +184,7 @@ const addFunfactToState = async (req, res) => {
 };
 
 
+// Gets all state info. Also filters based on contig param for contiguous or island states. I thought it said "config" for the longest time. Tough to troubleshoot.
 
 const getAllStates = async (req, res) => {
   const { contig } = req.query;
@@ -306,25 +225,19 @@ const getAllStates = async (req, res) => {
   }
 };
 
-
+//gets data for a specific state based on state code - Merges MongoDB with JSON
 
 const getStateByParam = async (req, res) => {
   const stateParam = req.params.state.toUpperCase();
 
-  // 1. Find JSON record
   const jsonState = data.states.find(state => state.code === stateParam);
   if (!jsonState) {
       return res.status(404).json({ message: `Invalid state abbreviation parameter` });
   }
 
   try {
-      // 2. Get funfacts from MongoDB
       const mongoState = await Statesdb.findOne({ stateCode: stateParam });
-
-      // 3. Start with a shallow copy of the JSON data
       const mergedState = { ...jsonState };
-
-      // 4. Add funfacts only if they exist and are non-empty
       if (mongoState?.funfacts?.length > 0) {
           mergedState.funfacts = mongoState.funfacts;
       }
@@ -336,6 +249,7 @@ const getStateByParam = async (req, res) => {
 };
 
 
+//Finds the state name and capital based on state code in the URL.
 
 const getStateCapitalByParam = (req, res) => {
     const stateParam = req.params.state.toLowerCase();
@@ -368,6 +282,8 @@ const getStateCapitalByParam = (req, res) => {
   };
 
 
+//Finds the state population based on state code in URL
+
 const getStatePopulationByParam = (req, res) => {
     const stateParam = req.params.state.toLowerCase();
   
@@ -399,6 +315,8 @@ const getStatePopulationByParam = (req, res) => {
   };
 
 
+// Not needed. I started out by emulating Employees from the tutorials. This would create a new state. Canada? Greenland?
+
 const createNewState = (req, res) => {
 
     const maxAdmissionNumber = data.states.reduce((max, st) => {
@@ -420,6 +338,8 @@ const createNewState = (req, res) => {
 }
 
 
+// Same. Not needed. Emulated from Employees.
+
 const updateState = (req, res) => {
     const state = data.states.find(stt => stt.admission_number === parseInt(req.body.admission_number));
     if (!state) {
@@ -433,6 +353,8 @@ const updateState = (req, res) => {
     res.json(data.states);
 }
 
+// Same. I hope we don't need to delete a state. Although California ...
+
 const deleteState = (req, res) => {
     const state = data.states.find(stt => stt.admission_number === parseInt(req.body.admission_number));
     if (!state) {
@@ -443,6 +365,7 @@ const deleteState = (req, res) => {
     res.json(data.states);
 }
 
+// Same. Initial get state attempt based on admin number I was going to use as an id before studying project reqs.
 
 const getState = (req, res) => {
     const state = data.states.find(stt => stt.admission_number === parseInt(req.params.admission_number));
