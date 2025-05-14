@@ -20,7 +20,7 @@ const getRandomFunfact = async (req, res) => {
       const randomIndex = Math.floor(Math.random() * foundState.funfacts.length);
       const randomFunfact = foundState.funfacts[randomIndex];
 
-      res.status(200).json({ stateCode, funfact: randomFunfact });
+      res.status(200).json({ funfact: randomFunfact });
 
   } catch (err) {
       res.status(500).json({ message: "Error fetching random funfact", error: err });
